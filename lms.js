@@ -32,5 +32,6 @@ $(document).on('click','.copyButton',function(e){
     copyToClipboard(question + "\n\n" + answers.map(function(item){
         return "---\n" + item + "\n";
     }) + "-------------------------------\n");
-});
+    alert('Copied');
+})
 $('.formulation').prepend($('<button class="copyButton" style="background-color:blue;width : 50px;color : white">Copy</button>'));
