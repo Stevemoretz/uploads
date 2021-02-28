@@ -30,7 +30,7 @@ $(document).on('click','.copyButton',function(e){
         answers.push($($(value).siblings('label')).text());
     });
     copyToClipboard(question + "\n\n" + answers.map(function(item){
-        return item + "\n";
-    }) + "----------------------------\n");
+        return "---\n" + item + "\n";
+    }) + "-------------------------------\n");
 });
 $('.formulation').prepend($('<button class="copyButton" style="background-color:blue;width : 50px;color : white">Copy</button>'));
