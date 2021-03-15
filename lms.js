@@ -24,6 +24,7 @@ if(window.location.href.includes('/mod/quiz')){
         }
     }
 
+
     $(document).on('click','.copyButton',function(e){
         const target = $(e.target);
         const question = $(target.siblings('.qtext')[0]).text();
@@ -31,8 +32,8 @@ if(window.location.href.includes('/mod/quiz')){
         $(target.siblings('.ablock').find('input:checked')).each(function(index,value){
             answers.push($($(value).siblings('label')).text());
         });
-        copyToClipboard(question + "\n\n" + answers.map(function(item){
-            return "---\n" + item + "\n";
+        copyToClipboard(question.replace(/( )/gm, " ").replace(/\n/gm, " ") + "\n\n" + answers.map(function(item){
+            return "---\n" + item.replace(/( )/gm, " ").replace(/\n/gm, " ") + "\n";
         }) + "-------------------------------\n");
         alert('Copied');
     })
@@ -71,30 +72,37 @@ if(window.location.href.includes('/mod/quiz')){
     $(document.body).append(smHeaderTop);
 
     $(document).on('click','.findButtonSM',function(e) {
-        const inputValue = $('#search-sm').val().replace(/\n/g, " ").replace(/( |\s)*/gm, '');
-        const answers = inputValue.split("---").filter(function(item){
-            return item !== '-' && item !== '';
-        }).map(function (item){
-            return item.replace(/( |\s)*/gm, '');
+        const questions = $('#search-sm').val().split(/-{4,}/mg).filter(function(item) {
+            return !(/^\s*$/mg.test(item));
         });
-        let done = false;
-        $('.qtext').each(function(index,item){
-            if(inputValue.includes($(item).text().replace(/\n/g, " ").replace(/( |\s)*/gm, ''))){
-                done = true;
-                $([document.documentElement, document.body]).animate({
-                    scrollTop: $(item).offset().top - 100
-                }, 200);
-                $($(item).siblings('.ablock').find('input')).each(function(index,value)    {
-                    const sr = answers.filter(function(item){
-                        return item.includes($($(value).siblings('label')).text().replace(/\n/g, " ").replace(/( |\s)*/gm, ''));
+        questions.forEach(function(inputValue,index){
+            inputValue = inputValue.replace(/\n/g, " ").replace(/( |\s)*/gm, '');
+            const answers = inputValue.split("---").filter(function(item){
+                return item !== '-' && item !== '';
+            }).map(function (item){
+                return item.replace(/( |\s)*/gm, '');
+            });
+            let done = false;
+            $('.qtext').each(function(index,item){
+                if(inputValue.includes($(item).text().replace(/\n/g, " ").replace(/( |\s)*/gm, ''))){
+                    done = true;
+                    $([document.documentElement, document.body]).animate({
+                        scrollTop: $(item).offset().top - 100
+                    }, 200);
+                    $($(item).siblings('.ablock').find('input')).each(function(index,value)    {
+                        const sr = answers.filter(function(item){
+                            return item.includes($($(value).siblings('label')).text().replace(/\n/g, " ").replace(/( |\s)*/gm, ''));
+                        });
+                        $(value).prop('checked', sr.length > 0);
                     });
-                    $(value).prop('checked', sr.length > 0);
-                });
+                }
+            });
+            if(questions.length === 1){
+                if(!done){
+                    alert('You do not have this question!');
+                }
             }
         });
-        if(!done){
-            alert('You do not have this question!');
-        }
         $('#search-sm').val('');
     });
 }
